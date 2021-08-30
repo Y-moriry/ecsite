@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8" />
+<link href="/css/style.css" th:href="@{/css/style.css}" rel="stylesheet" />
+<script src="http://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<link rel="stylesheet"
+		href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+
+<title>ECサイト　ユーザー登録</title>
+</head>
+<body>
+<script type="text/javascript">
+	$(() => {
+		$('button#checkUserName').on('click', () =>{
+			let userName = $('form#UserForm input[name=userName]').val();
+				if (userName == "") return;
+				checkUserName(userName);
+		});
+	});
+	
+	function checkUserName(userName) {
+		$.ajax({
+			type: 'POST',
+			url: '/ecsite/user/duplicatedUserName',
+			data: JSON.stringify({'userName': userName}),
+			contentType: 'application/json',
+		})
+		.then((result) => {
+			if (result) {
+				alert('既に登録されているユーザー名のため、使用できません。');
+				$('span#checkOK').hide();
+			}else {
+				$('button#register').prop('disabled', false);
+				$('span#checkOK').show();
+			}
+		}, () => {
+			alert('Error: ajax connection failed.');
+		});
+	}
+	
+</script>
+<header>
+	<h1>My EC Site -- Entry page</h1>
+</header>
+
+<div id="entryPage">
+	<h2>ユーザー登録</h2>
+	<form name="UserForm" id="UserForm" method="POST" 
+		action="/ecsite/user/addUser" th:action="@{/ecsite/user/addUser}">
+		User name:<input type="text" name="userName" th:value="${userName}" />
+		<button type ="button" id="checkUserName">重複チェック</button>
+		<span id ="checkOK" class="hidden" hidden>OK</span>
+		
+		<p>password :<input type="password" name="password" th:value="${password}" /></p>
+		<p>Full name:<input type="text" name="fullName" /></p>
+		<button type="submit" id="register" disabled>登録</button>
+	</form>
+</div>
+
+</body>
+</html>
+
+
